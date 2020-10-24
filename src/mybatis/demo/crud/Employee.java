@@ -1,5 +1,7 @@
 package mybatis.demo.crud;
 
+import java.sql.JDBCType;
+
 public class Employee {
     /**
      * 用户id 主键 自增
@@ -17,6 +19,21 @@ public class Employee {
      * 性别  女：0 男：1
      */
     private String gender;
+
+    /**
+     * 有参构造函数
+     * @param id
+     * @param lastName
+     * @param email
+     * @param gender
+     */
+    public Employee(Integer id, String lastName, String email, String gender) {
+
+        this.id=id;
+        this.lastName=lastName;
+        this.email=email;
+        this.gender=gender;
+    }
 
     /**
      * getter和setter方法
