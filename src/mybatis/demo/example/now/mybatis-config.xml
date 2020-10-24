@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 该 XML 文件用于构建 SqlSessionFactory
+    （
+    每个基于 MyBatis 的应用都是以一个 SqlSessionFactory 的实例为核心的,
+    SqlSessionFactory 的实例可以通过 SqlSessionFactoryBuilder 获得,
+    而 SqlSessionFactoryBuilder 则可以从 XML 配置文件
+    或一个预先配置的Configuration 实例来构建出 SqlSessionFactory 实例。
+    ）
+XML 配置文件中包含了对 MyBatis 系统的核心设置-->
+
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="db.properties">
+        <!--
+        <property name="username" value="dev_user"/>
+        <property name="password" value="F2Fa3!33TYyg"/>
+        -->
+    </properties>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="mybatis/demo/example/now/EmployeeMapper"/>
+    </mappers>
+</configuration>
