@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.demo.resultMap.DepartmentMapDao">
+
+    <!--查询方法-->
+    <select id="getDepById"  resultType="mybatis.demo.resultMap.Department">
+		select id,department_name departmentname from department where id = #{id}
+	</select>
+
+</mapper>

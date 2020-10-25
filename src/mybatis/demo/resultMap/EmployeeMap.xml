@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.demo.resultMap.EmployeeMapDao">
+
+    <!--自定义Employee这个JavaBean的封装规则
+    id：唯一id方便引用
+    type：自定义规则的Java类型-->
+    <resultMap id="employee" type="mybatis.demo.resultMap.Employee">
+        <!--指定主键列的封装规则
+        column：指定哪一列
+        property：指定对应的JavaBean属性-->
+        <id column="id" property="id"></id>
+        <!--定义普通列封装规则
+        不指定的列会自动封装，但建议只要写resultMap就把全部的映射规则都写上-->
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gander" property="gander"></result>
+    </resultMap>
+
+    <!--映射查询语句
+    resultMap：自定义结果集映射规则-->
+    <select id="getEmpById"  resultMap="employee">
+		select * from employee where id = #{id}
+	</select>
+
+
+
+    <!--场景一：
+    查询Employee的同时查询员工的部门
+    Employee======Department
+    一个员工有与之对应的部门信息-->
+
+    <!--联合查询：级联属性封装结果集-->
+    <resultMap id="empANDdep1" type="mybatis.demo.resultMap.Employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gander" property="gander"></result>
+        <result column="d_id" property="department.id"></result>
+        <result column="department_name" property="department.departmentname"></result>
+    </resultMap>
+
+    <!--联合查询：级联属性封装结果集-->
+    <resultMap id="empANDdep2" type="mybatis.demo.resultMap.Employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gander" property="gander"></result>
+        <!--association标签可以指定联合的JavaBean对象
+        property：指定哪个属性是联合的对象
+        javaType：指定这个属性对象的类型（不能省略）-->
+        <association property="department" javaType="mybatis.demo.resultMap.Department">
+            <id column="d_id" property="id"></id>
+            <result column="department_name" property="departmentname"></result>
+        </association>
+    </resultMap>
+
+    <!--<select id="getEmpANDDepById"  resultMap="empANDdep2">
+            select * from employee,department where employee.d_id=department.id AND employee.id=#{id}
+	</select>-->
+
+    <!--association分步查询-->
+    <resultMap id="empANDdep3" type="mybatis.demo.resultMap.Employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gander" property="gander"></result>
+        <association property="department"
+                     select="mybatis.demo.resultMap.DepartmentMapDao.getDepById"
+                     column="d_id">
+        </association>
+    </resultMap>
+
+    <select id="getEmpANDDepById"  resultMap="empANDdep3">
+		select * from employee where id = #{id}
+	</select>
+
+</mapper>
