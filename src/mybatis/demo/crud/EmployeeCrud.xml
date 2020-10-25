@@ -4,21 +4,83 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mybatis.demo.crud.EmployeeCrudDao">
 
+    <!--映射查询语句
+    select：用来定义查询操作
+    id：唯一标识符（用来引用这条语句，一般要求和接口方法名一致）
+    resultType：返回值类型（别名或者全类名，如果返回的是集合，定义集合中元素的类型，不能和resultMap同时使用）
+    parameterType：参数类型（可以不传，会根据TypeHandler自动推断）
+    #{id}从传递过来的参数值中取出id值
+    -->
     <select id="getEmpById"  resultType="mybatis.demo.crud.Employee">
 		select * from employee where id = #{id}
 	</select>
 
+    <!--映射查询语句 验证传递多个参数
+    注意：select * from employee where id = #{id} and gender=#{gender}
+    会报Parameter 'id' not found. Available parameters are [arg1, arg0, param1, param2]异常
+    原因：多参数会被封装成一个Map
+    正确的方法：
+    (1)select * from employee where id = #{arg0} and gender=#{arg1}
+    (2)select * from employee where id = #{param1} and gender=#{param2}
+   （3）使用命名参数：select * from employee where id = #{id} and gender=#{gender}
+    -->
+    <select id="getEmpAndById"  resultType="mybatis.demo.crud.Employee">
+		select * from employee where id = #{id} and gender=#{gender}
+	</select>
+
+    <!--映射查询语句  验证 Map传递多个参数
+    注意：因为Map中将id封装成了ID，gender封装成了Gender
+    所以要用#{key}来表示
+    -->
+    <select id="getEmpMapById"  resultType="mybatis.demo.crud.Employee">
+		select * from employee where id = #{ID} and gender=#{Gender}
+	</select>
+
+    <!--映射查询语句  查询多条记录，返回一个集合
+    注意：resultType要使用定义集合中元素的类型（因为返回的是集合）
+    -->
+    <select id="getEmpsByLastNameLike"  resultType="mybatis.demo.crud.Employee">
+		select * from employee where last_name like #{listName}
+	</select>
+
+    <!--映射查询语句  返回一条记录的Map,Key是列名，值是对应的值-->
+    <select id="getEmpByIdReturnMap"  resultType="Map">
+		select * from employee where id=#{id}
+	</select>
+
+    <!--映射查询语句
+    多条记录封装一个Map,Map<Integer,Employee>:键是这条记录的主键，值是封装后的JavaBean-->
+    <select id="getEmpByLastNameLikeReturnMap"  resultType="mybatis.demo.crud.Employee">
+		select * from employee where last_name like #{listName}
+	</select>
+
+    <!--映射插入语句-->
     <insert id="addEmp">
         insert into employee(last_name,email,gender)
         value(#{lastName},#{email},#{gender})
     </insert>
 
+    <!--MyBatis的主键策略：
+    MySQL支持自增主键，自增主键的获取MyBatis也是利用statement.getGenreatedKeys()；
+    useGeneratedKeys="true"==>使用主键自增获取主键值策略
+    keyProperty:指定对应的主键属性，也就是MyBatis获取到主键值以后将值封装给JavaBean的哪个属性
+    parameterType：参数类型 可以省略
+    -->
+    <!--映射插入语句 验证主键策略-->
+    <insert id="addEmpKeys"  useGeneratedKeys="true" keyProperty="id"
+            parameterType="mybatis.demo.crud.Employee">
+        insert into employee(last_name,email,gender)
+        value(#{lastName},#{email},#{gender})
+    </insert>
+
+    <!--映射更新语句-->
     <update id="updateEmp">
         update employee
         set last_name=#{lastName},email=#{email},gender=#{gender}
         where id=#{id}
     </update>
 
+    <!--映射删除语句-->
     <delete id="deleteEmpById">
         delete from employee where id = #{id}
     </delete>

@@ -1,7 +1,5 @@
 package mybatis.demo.crud;
 
-import java.sql.JDBCType;
-
 public class Employee {
     /**
      * 用户id 主键 自增
