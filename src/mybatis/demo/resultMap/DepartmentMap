@@ -5,9 +5,37 @@
 
 <mapper namespace="mybatis.demo.resultMap.DepartmentMapDao">
 
-    <!--查询方法-->
+    <!--查询方法
+    注意：数据库中的字段与JavaBean中的不对应
+    department_name departmentname（别名）-->
     <select id="getDepById"  resultType="mybatis.demo.resultMap.Department">
 		select id,department_name departmentname from department where id = #{id}
+	</select>
+
+    <!--场景二：
+    查询部门时将该部门所有的员工也查询出来-->
+
+    <!--多表联查  嵌套结果集的方式-->
+    <resultMap id="depANDEmp" type="mybatis.demo.resultMap.Department">
+        <id column="id" property="id"></id>
+        <result column="department_name" property="departmentname"></result>
+        <!--collection定义关联集合类型的属性封装规则：
+        ofType：指定集合里边元素的类型-->
+        <collection property="employee" ofType="mybatis.demo.resultMap.Employee">
+            <!--定义这个集合里边元素的封装规则-->
+            <id column="pid" property="id"></id>
+            <result column="last_name" property="lastName"></result>
+            <result column="email" property="email"></result>
+            <result column="gender" property="gender"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getDepByEmpId"  resultMap="depANDEmp">
+		select d.id,d.department_name,e.id,e.last_name,e.email,e.gender,e.d_id
+		FROM department d
+		LEFT JOIN employee e
+		ON d.id=e.d_id
+		where d.id=#{id}
 	</select>
 
 </mapper>

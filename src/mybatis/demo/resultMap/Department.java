@@ -1,5 +1,9 @@
 package mybatis.demo.resultMap;
 
+import org.apache.ibatis.type.Alias;
+
+import java.util.List;
+
 public class Department {
 
     /**
@@ -10,6 +14,10 @@ public class Department {
      * 部门名称
      */
     private String departmentname;
+    /**
+     *部门中的员工
+     */
+    private List<Employee> employee;
 
     /**
      *  getter和setter
@@ -31,6 +39,13 @@ public class Department {
         this.departmentname = departmentname;
     }
 
+    public List<Employee> getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(List<Employee> employee) {
+        this.employee = employee;
+    }
 
     @Override
     public String toString() {

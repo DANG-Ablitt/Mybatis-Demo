@@ -42,7 +42,7 @@
         <result column="department_name" property="department.departmentname"></result>
     </resultMap>
 
-    <!--联合查询：级联属性封装结果集-->
+    <!--通过association标签封装-->
     <resultMap id="empANDdep2" type="mybatis.demo.resultMap.Employee">
         <id column="id" property="id"></id>
         <result column="last_name" property="lastName"></result>
@@ -57,16 +57,25 @@
         </association>
     </resultMap>
 
+    <!--多表联查-->
     <!--<select id="getEmpANDDepById"  resultMap="empANDdep2">
             select * from employee,department where employee.d_id=department.id AND employee.id=#{id}
 	</select>-->
 
-    <!--association分步查询-->
+    <!--association分步查询
+    1.先按照员工id查询员工信息
+    2.根据查询到的员工信息中的d_id值去部门表查出部门信息
+    3.将部门信息设置到员工中-->
     <resultMap id="empANDdep3" type="mybatis.demo.resultMap.Employee">
         <id column="id" property="id"></id>
         <result column="last_name" property="lastName"></result>
         <result column="email" property="email"></result>
         <result column="gander" property="gander"></result>
+        <!--association定义关联对象的封装规则：
+        property：指定哪个属性是联合的对象
+        select：表示当前属性是调用select指定的方法查出的结果
+        column：指定将哪一列的值传给这个方法
+        流程：使用select指定的方法（传入column指定的列的参数值）查出对象，并封装给property-->
         <association property="department"
                      select="mybatis.demo.resultMap.DepartmentMapDao.getDepById"
                      column="d_id">
@@ -76,5 +85,14 @@
     <select id="getEmpANDDepById"  resultMap="empANDdep3">
 		select * from employee where id = #{id}
 	</select>
+
+    <!--注意：可以使用延时加载（按需加载）：
+    Employee======>Department
+    前面的方法我们每次查询Employee的时候会把Department也查询出来
+    如果我们希望用到Department的时候再将Department的信息查询出来可以启用该配置
+    在配置文件中添加两个配置-->
+
+    <!--场景二：
+    查询部门时将该部门所有的员工也查询出来-->
 
 </mapper>

@@ -14,11 +14,24 @@ XML 配置文件中包含了对 MyBatis 系统的核心设置-->
 <configuration>
 
     <properties resource="db.properties">
+
         <!--
         <property name="username" value="root"/>
         <property name="password" value="123456"/>
         -->
     </properties>
+
+
+    <settings>
+
+        <!--控制延迟加载
+        原则上都要显示配置，即使默认值是正确的
+        因为以后的版本默认值可能会发生变化-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="true"/>
+
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
 
     <environments default="development">
         <environment id="development">
