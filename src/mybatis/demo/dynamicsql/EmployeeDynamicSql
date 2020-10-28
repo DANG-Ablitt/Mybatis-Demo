@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.demo.dynamicsql.EmployeeDynamicSqlDao">
+
+    <!--常用标签介绍：
+    （1）if（判断）
+    （2）choose（when otherwise） 分支选择：switch-case
+         说明：如果带了id就用id查，如果带了lastName就用lastName查
+    （3）trim字符串截取（where（封装查询条件） set（封装修改条件））
+    （4）foreach
+    -->
+
+    <!--查询员工：（if）
+    要求携带了哪个字段查询条件就带上这个字段值
+    映射查询语句：-->
+    <select id="getEmpsByConditionIf" resultType="mybatis.demo.dynamicsql.Employee">
+		select * from employee
+        <where>
+		<if test="id!=null">
+            and id = #{id}
+        </if>
+        <if test="lastName!=null and lastName!=&quot;&quot;">
+            and last_name like #{lastName}
+        </if>
+        <if test="email!=null and email.trim()!=&quot;&quot;">
+            and email = #{email}
+        </if>
+        <if test="gender==0 or gender==1">
+            and gender = #{gender}
+        </if>
+        </where>
+	</select>
+
+    <!--上边发现的问题：
+    如果id的值传递为null，就会出现SQL拼接错误：
+    Preparing: select * from employee where and last_name like ?
+    解决方案：
+    （1）添加 where 1=1
+    （2）使用where标签（将所有的查询条件包括在内，
+         MyBatis就会将where标签中拼接多出来的and or等去掉）,
+         但请注意：如果把and放在语句后边将无法消除，尽量不要这样写
+    这些说明可以在上边的查询中进行验证-->
+
+    <!--使用trim标签自定义字符串的截取规则-->
+    <select id="getEmpsByConditionTrim" resultType="mybatis.demo.dynamicsql.Employee">
+        select * from employee
+        <!--trim可以解决上边where标签无法消除后边加的and的问题
+        prefix：前缀 整个字符串拼接后的结果
+        prefixOverrides：前缀覆盖 去掉整个字符串前边多余的字符
+        suffix：后缀 整个字符串拼接后的结果
+        suffixOverrides：后缀覆盖 去掉整个字符串后边多余的字符-->
+        <trim prefix="where" suffixOverrides="and">
+            <if test="id!=null">
+                id = #{id} and
+            </if>
+            <if test="lastName!=null and lastName!=&quot;&quot;">
+                last_name like #{lastName} and
+            </if>
+            <if test="email!=null and email.trim()!=&quot;&quot;">
+                email = #{email} and
+            </if>
+            <if test="gender==0 or gender==1">
+                gender = #{gender} and
+            </if>
+        </trim>
+    </select>
+
+    <select id="getEmpsByConditionChoose" resultType="mybatis.demo.dynamicsql.Employee">
+        select * from employee
+        <where>
+            <!--如果带了id就用id查，如果带了lastName就用lastName查-->
+            <choose>
+                <when test="id!=null">
+                    id=#{id}
+                </when>
+                <when test="lastName!=null">
+                    last_name like #{lastName}
+                </when>
+                <when test="email!=null">
+                    email=#{email}
+                </when>
+                <when test="gender!=null">
+                    gender=#{gender}
+                </when>
+                <otherwise>
+                    1=1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <!--修改数据   使用set标签-->
+    <!--<update id="updateEmp" parameterType="mybatis.demo.dynamicsql.Employee">
+        update employee
+        <set>
+            <if test="lastName!=null">
+                last_name=#{lastName},
+            </if>
+            <if test="email!=null">
+                email = #{email},
+            </if>
+            <if test="gender==0 or gender==1">
+                gender = #{gender}
+            </if>
+        </set>
+        where id=#{id}
+    </update>-->
+
+    <!--修改数据   使用trim标签代替set标签-->
+   <update id="updateEmp" parameterType="mybatis.demo.dynamicsql.Employee">
+        update employee
+        <trim prefix="set" suffixOverrides=",">
+            <if test="lastName!=null">
+                last_name=#{lastName},
+            </if>
+            <if test="email!=null">
+                email = #{email},
+            </if>
+            <if test="gender==0 or gender==1">
+                gender = #{gender}
+            </if>
+       </trim>
+        where id=#{id}
+    </update>
+
+    <!--对集合进行遍历（尤其是在构建 IN 条件语句的时候）-->
+    <select id="getEmpsByConditionForeach" resultType="mybatis.demo.dynamicsql.Employee">
+        select * from employee where id in
+        <!--foreach标签说明：
+        collection：指定要遍历的集合
+                   list类型的参数会特殊处理封装在Map中，Map的Key就叫list
+        item：将当前遍历出的元素赋值给指定的变量
+        separator：每个元素之间的分隔符
+        close：拼接一个结束的字符
+        open：拼接一个开始的字符
+        index：索引 遍历list的时候是索引
+                   遍历Map的时候index表示的就是Map的Key，item就是Map的值-->
+        <foreach collection="ids" item="item_id" separator="," index="" close=")" open="(">
+            #{item_id}
+        </foreach>
+    </select>
+</mapper>
