@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.demo.cache.EmployeeCache">
+
+    <!--在名称空间之间共享相同的缓存配置和实例-->
+    <!--<cache-ref namespace="com.someone.application.data.SomeMapper"/>
+    指定和com.someone.application.data.SomeMapper这个命名空间下的配置一样-->
+
+    <!--二级缓存的配置：
+    eviction：缓存的回收策略（默认LRU）
+    （1）LRU：最近最少使用的，移除最长时间不被使用的对象
+    （2）FIFO：先进先出，按对象进入缓存的顺序移除他们
+    （3）SOFT：软引用：移除基于垃圾回收器状态和软引用规则的对象
+    （4）WEAK：弱引用：更积极地移除基于垃圾收集器状态和弱引用规则的对象
+    flushInterval：缓存刷新间隔
+        缓存多长时间清空一次，默认不清空，设置一个毫秒值
+    readOnly：是否只读
+        true：只读
+            MyBatis认为所有从缓存中获取数据的操作都为只读操作，不会修改数据
+            MyBatis为了加快获取速度，直接就会将数据在缓存中的引用交给用户（速度快，不安全）
+        false：非只读
+            MyBatis认为获取的数据可能被修改
+            MyBatis会利用序列化&反序列化的技术克隆一份新的数据给你（安全、速度慢）
+    blocking：
+    size：缓存存放多少元素
+    type：自定义缓存的全类名-->
+    <!--<cache eviction="LRU" flushInterval="6000"
+           readOnly="true" size="1024"></cache>-->
+
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>
+
+    <!--映射查询语句-->
+    <select id="getEmpById"  resultType="mybatis.demo.cache.Employee" useCache="true">
+		select * from employee where id = #{id}
+	</select>
+
+    <!--映射更新语句-->
+    <update id="updateEmp">
+        update employee
+        set last_name=#{lastName},email=#{email},gender=#{gender}
+        where id=#{id}
+    </update>
+</mapper>
